@@ -14,6 +14,7 @@
 #include <linux/kref.h>
 #include <linux/uaccess.h>
 #include <linux/uio.h>
+#include <linux/version.h>
 #include "handle.h"
 #include "peer.h"
 #include "tests.h"
@@ -165,7 +166,11 @@ static void bus1_test_pool(void)
 	WARN_ON(r < 0);
 
 	old_fs = get_fs();
+#if LINUX_VERSION_CODE < KERNEL_VERSION(5,1,0)	
 	set_fs(get_ds());
+#else
+	set_fs(KERNEL_DS);
+#endif
 	r = bus1_pool_write_iovec(&pool, &slice, 0, &vec, 1, vec.iov_len);
 	WARN_ON(r < 0);
 	set_fs(old_fs);

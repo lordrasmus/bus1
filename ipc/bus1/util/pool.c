@@ -21,6 +21,7 @@
 #include <linux/shmem_fs.h>
 #include <linux/sizes.h>
 #include <linux/slab.h>
+#include <linux/version.h>
 #include <linux/uaccess.h>
 #include <linux/uio.h>
 #include "pool.h"
@@ -500,7 +501,12 @@ ssize_t bus1_pool_write_kvec(struct bus1_pool *pool,
 	iov_iter_kvec(&iter, WRITE | ITER_KVEC, iov, n_iov, total_len);
 
 	old_fs = get_fs();
+
+#if LINUX_VERSION_CODE < KERNEL_VERSION(5,1,0)
 	set_fs(get_ds());
+#else
+	set_fs(KERNEL_DS);
+#endif
 	len = vfs_iter_write(pool->f, &iter, &offset, 0);
 	set_fs(old_fs);
 
